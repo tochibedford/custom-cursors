@@ -1,5 +1,3 @@
-import { assert } from "console";
-
 const objects: Pointer[] = [];
 
 const mouse = {
@@ -27,8 +25,8 @@ class Pointer {
 
         const newPointerOptions = Object.assign(pointerOptionsDefaults, pointerOptions)
 
-        this._x = 0
-        this._y = 0
+        this._x = window.innerWidth / 2
+        this._y = window.innerHeight / 2
         this._dx = 0
         this._dy = 0
         this._speed = newPointerOptions.speed
