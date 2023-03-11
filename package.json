@@ -1,10 +1,14 @@
 {
   "name": "custom-cursors",
   "version": "0.0.1",
-  "main": "index.js",
+  "main": "./dist/index.js",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc"
   },
+  "typeRoots": [
+    "./dist"
+  ],
   "keywords": [
     "cursor",
     "curses",
@@ -15,5 +19,8 @@
   "description": "A simple Library to add beautiful custom cursors to your webpage. A replacement for 'custom-curses'",
   "devDependencies": {
     "typescript": "^4.9.5"
+  },
+  "dependencies": {
+    "@types/node": "^18.15.0"
   }
 }

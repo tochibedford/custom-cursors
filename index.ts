@@ -1,3 +1,5 @@
+import { assert } from "console";
+
 const objects: Pointer[] = [];
 
 const mouse = {
@@ -5,28 +7,37 @@ const mouse = {
     y: window.innerHeight / 2
 }
 
+type IPointerOptions = {
+    speed?: number
+    element?: HTMLElement
+}
 class Pointer {
     private _x: number
     private _y: number
     private _dx: number // difference between mouse poition and current x position
     private _dy: number
     private _speed: number // 1 is normal
-    public _animate: boolean
     public _element: HTMLElement
 
-    constructor(x: number, y: number, dx: number, dy: number, speed: number, element: HTMLElement) {
-        this._x = x
-        this._y = y
+    constructor(pointerOptions: Partial<IPointerOptions>) {
+        const pointerOptionsDefaults: IPointerOptions = {
+            speed: 1,
+            element: pointerOptions.element
+        }
+
+        const newPointerOptions = Object.assign(pointerOptionsDefaults, pointerOptions)
+
+        this._x = 0
+        this._y = 0
         this._dx = 0
         this._dy = 0
-        this._speed = speed
-        this._element = element
-        this._animate = true
-        element.style.cssText =
+        this._speed = newPointerOptions.speed
+        this._element = newPointerOptions.element
+        this._element.style.cssText =
             `
                 position: absolute; 
-                left: ${x}px;
-                top: ${y}px;
+                left: ${this._x}px;
+                top: ${this._y}px;
                 pointer-events: none;
             `
     }
@@ -49,22 +60,80 @@ class Pointer {
 
 }
 
-//animates all pointers
-function syncAnimate(time: DOMHighResTimeStamp) {
-    objects.forEach(pointer => {
-        if (pointer._animate) {
-            pointer.update(mouse)
-        }
-    })
+type ICursorOptions = {
+    pointers: Pointer[]
+    hideMouse: boolean
+    container: HTMLElement
+}
 
-    requestAnimationFrame(syncAnimate)
+class Cursor {
+    private _hideMouse: boolean
+    private _pointers: Pointer[]
+    private _container: HTMLElement
+
+    constructor(_cursorOptions: Partial<ICursorOptions> & { pointers: Pointer[] }) {
+        // Array.isArray(_cursorOptions.pointers) ? _cursorOptions.pointers.length : 0  - checks that _cursorOptions.pointers is an array
+        // and if it is it returns the length of array else it returns 0, a bang operator is then used to negate it
+        if (!(Array.isArray(_cursorOptions.pointers) ? _cursorOptions.pointers.length : 0)) {
+            throw ("You need to provide at least 1 pointer in an array to the cursor")
+        }
+        const cursorOptionsDefaults: ICursorOptions = {
+            pointers: null,
+            hideMouse: false,
+            container: document.body
+        }
+
+        const cursorOptions = Object.assign(cursorOptionsDefaults, _cursorOptions)
+        this._hideMouse = cursorOptions.hideMouse
+        this._pointers = cursorOptions.pointers
+        this._container = cursorOptions.container
+    }
+
+    initCursor() {
+        if (this.hideMouse) {
+            this.container.style.cursor = "none"
+        }
+        objects.push(...this.pointers)
+        return () => {
+            // cleanup
+            this.pointers.forEach(pointer => {
+                objects.splice(objects.indexOf(pointer), 1)
+            })
+        }
+    }
+
+    public get pointers() {
+        return this._pointers
+    }
+
+    public get container() {
+        return this._container
+    }
+
+    public get hideMouse() {
+        return this._hideMouse
+    }
 
 }
 
+//animates all pointers
+let animId: number;
+function syncAnimate(time: DOMHighResTimeStamp) {
+    objects.forEach(pointer => {
+        pointer.update(mouse)
+    })
 
-// window.addEventListener('mousemove', (event) => {
-//     mouse.x = event.clientX
-//     mouse.y = event.clientY
-// })
+    animId = requestAnimationFrame(syncAnimate)
+}
 
-// const mouse = new Pointer()
+
+function init() {
+    animId = requestAnimationFrame(syncAnimate)
+}
+
+window.addEventListener('mousemove', (event) => {
+    mouse.x = event.pageX
+    mouse.y = event.pageY
+})
+
+export { Cursor, Pointer, init }
