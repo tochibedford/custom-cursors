@@ -12,5 +12,8 @@
   ],
   "author": "Tochi Bedford",
   "license": "ISC",
-  "description": "A simple Library to add beautiful custom cursors to your webpage."
+  "description": "A simple Library to add beautiful custom cursors to your webpage. A replacement for 'custom-curses'",
+  "devDependencies": {
+    "typescript": "^4.9.5"
+  }
 }
