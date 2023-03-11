@@ -1,0 +1,16 @@
+{
+  "name": "custom-cursors",
+  "version": "0.0.1",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "cursor",
+    "curses",
+    "custom"
+  ],
+  "author": "Tochi Bedford",
+  "license": "ISC",
+  "description": "A simple Library to add beautiful custom cursors to your webpage."
+}
