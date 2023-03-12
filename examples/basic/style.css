@@ -14,7 +14,7 @@ body {
   width: 800px;
   height: 300px;
   border: 1px solid #777;
-  /* overflow: hidden; */
+  overflow: hidden;
   position: relative;
   transform: translateY(100px);
 }
