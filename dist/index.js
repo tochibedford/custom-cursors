@@ -9,20 +9,22 @@ class Pointer {
     _dx; // difference between mouse poition and current x position
     _dy;
     _speed; // 1 is normal
-    _element;
+    element;
+    container;
     constructor(pointerOptions) {
         const pointerOptionsDefaults = {
             speed: 1,
             element: pointerOptions.element
         };
         const newPointerOptions = Object.assign(pointerOptionsDefaults, pointerOptions);
-        this._x = 0;
-        this._y = 0;
+        this._x = window.innerWidth / 2;
+        this._y = window.innerHeight / 2;
         this._dx = 0;
         this._dy = 0;
         this._speed = newPointerOptions.speed;
-        this._element = newPointerOptions.element;
-        this._element.style.cssText =
+        this.element = newPointerOptions.element;
+        this.container = document.body;
+        this.element.style.cssText =
             `
                 position: absolute; 
                 left: ${this._x}px;
@@ -31,8 +33,8 @@ class Pointer {
             `;
     }
     draw() {
-        this._element.style.left = `${this._x - this._element.getBoundingClientRect().width / 2}px`;
-        this._element.style.top = `${this._y - this._element.getBoundingClientRect().height / 2}px`;
+        this.element.style.left = `${this._x - this.element.getBoundingClientRect().width / 2 - (window.pageXOffset + this.container.getBoundingClientRect().left)}px`;
+        this.element.style.top = `${this._y - this.element.getBoundingClientRect().height / 2 - (window.pageYOffset + this.container.getBoundingClientRect().top)}px`;
     }
     update(_mouse) {
         //difference in distance
@@ -68,7 +70,10 @@ class Cursor {
         if (this.hideMouse) {
             this.container.style.cursor = "none";
         }
-        objects.push(...this.pointers);
+        this._pointers.forEach(pointer => {
+            pointer.container = this._container;
+        });
+        objects.push(...this._pointers);
         return () => {
             // cleanup
             this.pointers.forEach(pointer => {
@@ -87,15 +92,14 @@ class Cursor {
     }
 }
 //animates all pointers
-let animId;
-function syncAnimate(time) {
+function syncAnimate() {
     objects.forEach(pointer => {
         pointer.update(mouse);
     });
-    animId = requestAnimationFrame(syncAnimate);
+    requestAnimationFrame(syncAnimate);
 }
 function init() {
-    animId = requestAnimationFrame(syncAnimate);
+    requestAnimationFrame(syncAnimate);
 }
 window.addEventListener('mousemove', (event) => {
     mouse.x = event.pageX;

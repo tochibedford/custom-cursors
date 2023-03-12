@@ -8,7 +8,8 @@ declare class Pointer {
     private _dx;
     private _dy;
     private _speed;
-    _element: HTMLElement;
+    element: HTMLElement;
+    container: HTMLElement;
     constructor(pointerOptions: Partial<IPointerOptions>);
     draw(): void;
     update(_mouse: {
