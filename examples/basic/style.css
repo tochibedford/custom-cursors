@@ -19,9 +19,11 @@ body {
   transform: translateY(100px);
 }
 
-.curs {
+.curs,
+.curs2 {
   width: 100px;
   height: 100px;
   display: grid;
   place-items: center;
+  mix-blend-mode: multiply;
 }

@@ -8,6 +8,8 @@ const mouse = {
 type IPointerOptions = {
     speed?: number
     element?: HTMLElement
+    xOffset?: number
+    yOffset?: number
 }
 class Pointer {
     private _x: number
@@ -17,11 +19,15 @@ class Pointer {
     private _speed: number // 1 is normal
     public element: HTMLElement
     public container: HTMLElement
+    public xOffset: number
+    public yOffset: number
 
     constructor(pointerOptions: Partial<IPointerOptions>) {
         const pointerOptionsDefaults: IPointerOptions = {
             speed: 1,
-            element: pointerOptions.element
+            element: pointerOptions.element,
+            xOffset: 0,
+            yOffset: 0
         }
 
         const newPointerOptions = Object.assign(pointerOptionsDefaults, pointerOptions)
@@ -33,21 +39,23 @@ class Pointer {
         this._speed = newPointerOptions.speed
         this.element = newPointerOptions.element
         this.container = document.body
+        this.xOffset = newPointerOptions.xOffset
+        this.yOffset = newPointerOptions.yOffset
         this.element.style.cssText =
             `
                 position: absolute; 
-                left: ${this._x}px;
-                top: ${this._y}px;
+                left: ${this._x + this.xOffset}px;
+                top: ${this._y + this.yOffset}px;
                 pointer-events: none;
             `
     }
 
-    draw() {
-        this.element.style.left = `${this._x - this.element.getBoundingClientRect().width / 2 - (window.pageXOffset + this.container.getBoundingClientRect().left)}px`
-        this.element.style.top = `${this._y - this.element.getBoundingClientRect().height / 2 - (window.pageYOffset + this.container.getBoundingClientRect().top)}px`
+    __draw__() {
+        this.element.style.left = `${(this._x + this.xOffset) - this.element.getBoundingClientRect().width / 2 - (window.pageXOffset + this.container.getBoundingClientRect().left)}px`
+        this.element.style.top = `${(this._y + this.yOffset) - this.element.getBoundingClientRect().height / 2 - (window.pageYOffset + this.container.getBoundingClientRect().top)}px`
     }
 
-    update(_mouse: { x: number, y: number }) {
+    __update__(_mouse: { x: number, y: number }) {
         //difference in distance
         this._dx = _mouse.x - this._x
         this._dy = _mouse.y - this._y
@@ -55,7 +63,7 @@ class Pointer {
         //modify position based on difference
         this._x += this._dx * this._speed
         this._y += this._dy * this._speed
-        this.draw()
+        this.__draw__()
     }
 
 }
@@ -120,11 +128,10 @@ class Cursor {
 }
 
 //animates all pointers
-function syncAnimate() {
+function syncAnimate(time: DOMHighResTimeStamp) {
     objects.forEach(pointer => {
-        pointer.update(mouse)
+        pointer.__update__(mouse)
     })
-
     requestAnimationFrame(syncAnimate)
 }
 

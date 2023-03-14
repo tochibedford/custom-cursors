@@ -1,6 +1,8 @@
 type IPointerOptions = {
     speed?: number;
     element?: HTMLElement;
+    xOffset?: number;
+    yOffset?: number;
 };
 declare class Pointer {
     private _x;
@@ -10,9 +12,11 @@ declare class Pointer {
     private _speed;
     element: HTMLElement;
     container: HTMLElement;
+    xOffset: number;
+    yOffset: number;
     constructor(pointerOptions: Partial<IPointerOptions>);
-    draw(): void;
-    update(_mouse: {
+    __draw__(): void;
+    __update__(_mouse: {
         x: number;
         y: number;
     }): void;
